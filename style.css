@@ -71,3 +71,11 @@
     margin-top: 80px;
 }
 
+.plant-thumbnail {
+    max-width: 256px;
+    max-height: 256px;
+}
+
+.plant-row{
+    cursor: pointer;
+}

@@ -30,8 +30,7 @@
     </div>
 
     <div class="container search-results-container">
-        <table class="table table-hover" ng-class="searchResults.results && searchResults.results.length > 4 ? 'table-striped' : ''"
-               ng-show="searchResults.results">
+        <table class="table table-hover" ng-show="searchResults.results">
             <thead>
                 <tr>
                     <th> </th>
@@ -40,10 +39,10 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="searchResult in searchResults.results">
-                    <td>some-image</td>
-                    <td>{{searchResult}}</td>
-                    <td>some-description</td>
+                <tr ng-repeat="searchResultId in searchResults.results" ng-show="searchResultsData[searchResultId]" class="plant-row">
+                    <td><img ng-src="{{searchResultsData[searchResultId].photo_links[0]}}" class="plant-thumbnail"/></td>
+                    <td>{{searchResultsData[searchResultId].name}}</td>
+                    <td>{{searchResultsData[searchResultId].description}}</td>
                 </tr>
             </tbody>
         </table>
