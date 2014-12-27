@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html ng-app="poc">
+<head lang="en">
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="libraries/bootstrap.css">
+    <link rel="stylesheet" href="style.css">
+
+    <script type="application/javascript" src="libraries/angular.js"></script>
+    <script type="application/javascript" src="libraries/angular-mocks.js"></script>
+    <script type="application/javascript" src="libraries/json2.js"></script>
+    <script type="application/javascript" src="libraries/minify.json.js"></script>
+    <script type="application/javascript" src="app.js"></script>
+
+    <title>Medicinalia - Proof of Concept</title>
+
+    <meta name="keywords" content="project, infoiasi, wade, web"/>
+</head>
+<body ng-controller="SearchController as searchCtrl">
+
+    <div class="navbar navbar-fixed-top">
+        <div class="container-fluid container-navbar">
+            <img src="medicinalia-logo.png" class="navbar-brand logo" />
+            <form class="search-form" role="search"
+                  ng-submit="performSearch(form.searchString)" novalidate>
+                <input type="text" class="search-textbox" placeholder="Type a name or constraint to search for..." ng-model="form.searchString">
+                <button type="submit" class="search-button" ng-disabled="!form.searchString">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container search-results-container">
+        <table class="table table-hover" ng-class="searchResults.results && searchResults.results.length > 4 ? 'table-striped' : ''"
+               ng-show="searchResults.results">
+            <thead>
+                <tr>
+                    <th> </th>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="searchResult in searchResults.results">
+                    <td>some-image</td>
+                    <td>{{searchResult}}</td>
+                    <td>some-description</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
