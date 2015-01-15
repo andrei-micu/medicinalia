@@ -3,13 +3,20 @@
 <head lang="en">
     <meta charset="UTF-8">
 
-    <link rel="stylesheet" href="libraries/bootstrap.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.css">
     <link rel="stylesheet" href="style.css">
 
-    <script type="application/javascript" src="libraries/angular.js"></script>
-    <script type="application/javascript" src="libraries/angular-mocks.js"></script>
-    <script type="application/javascript" src="libraries/json2.js"></script>
-    <script type="application/javascript" src="libraries/minify.json.js"></script>
+
+    <script type="application/javascript" src="js/jquery-2.1.3.js"></script>
+    <script type="application/javascript" src="js/bootstrap.js"></script>
+
+    <script type="application/javascript" src="js/angular.js"></script>
+    <script type="application/javascript" src="js/angular-animate.js"></script>
+    <script type="application/javascript" src="js/angular-mocks.js"></script>
+
+    <script type="application/javascript" src="js/json2.js"></script>
+    <script type="application/javascript" src="js/minify.json.js"></script>
     <script type="application/javascript" src="app.js"></script>
 
     <title>Medicinalia - Proof of Concept</title>
@@ -18,35 +25,64 @@
 </head>
 <body ng-controller="SearchController as searchCtrl">
 
-    <div class="navbar navbar-fixed-top">
-        <div class="container-fluid container-navbar">
-            <img src="medicinalia-logo.png" class="navbar-brand logo" />
-            <form class="search-form" role="search"
-                  ng-submit="performSearch(form.searchString)" novalidate>
-                <input type="text" class="search-textbox" placeholder="Type a name or constraint to search for..." ng-model="form.searchString">
-                <button type="submit" class="search-button" ng-disabled="!form.searchString">Search</button>
-            </form>
-        </div>
-    </div>
+<div class="navbar navbar-fixed-top">
+    <div class="container-fluid container-navbar">
+        <img src="medicinalia-logo.png" class="navbar-brand logo"/>
 
-    <div class="container search-results-container">
-        <table class="table table-hover" ng-show="searchResults.results">
-            <thead>
-                <tr>
-                    <th> </th>
-                    <th>Name</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="searchResultId in searchResults.results" ng-show="searchResultsData[searchResultId]" class="plant-row">
-                    <td><img ng-src="{{searchResultsData[searchResultId].photo_links[0]}}" class="plant-thumbnail"/></td>
-                    <td>{{searchResultsData[searchResultId].name}}</td>
-                    <td>{{searchResultsData[searchResultId].description}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <form class="search-form" role="search"
+              ng-submit="performSearch(form.searchString)" novalidate>
+            <input type="text" class="search-textbox" placeholder="Type a name or constraint ..."
+                   ng-model="form.searchString">
+            <button type="submit" class="search-button" ng-disabled="!form.searchString">Search</button>
+        </form>
     </div>
+</div>
+
+<div class="container search-results-container">
+    <table class="table table-hover" ng-show="searchResults.results">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="searchResultId in searchResults.results" ng-show="searchResultsData[searchResultId]" class="clickable">
+            <td><img ng-src="{{searchResultsData[searchResultId].photo_links[0]}}" class="plant-thumbnail"/></td>
+            <td>{{searchResultsData[searchResultId].name}}</td>
+            <td>{{searchResultsData[searchResultId].description}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="navbar navbar-fixed-bottom ad-bar" ng-show="showAdBar">
+    <div class="container-fluid">
+        <div class="nav plant-thumbnail-ad-bar-container pull-left">
+            <img class="plant-thumbnail-ad-bar"
+                 src="https://www.googleapis.com/freebase/v1/image/m/02f8wvh?key=AIzaSyCQVC9yA72POMg2VjiQhSJQQP1nf3ToZTs&maxwidth=960"/>
+        </div>
+
+        <div class="nav ad-text-container pull-left">
+            <span class="ad-text">
+                Since we're in the cold season, Medicinalia recommends you <strong>Chamomile</strong>!
+                This plant is known for containing a high amount of Vitamin C, which will keep your immune system
+                up-and-running.
+            </span>
+        </div>
+
+        <div class="nav navbar-right pull-right">
+            <div class="close-ad-button-container">
+                <div class="close-ad-button clickable text-center" aria-label="Close" ng-click="showAdBar=0" ng-init="showAdBar=1">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Glyphicons Halflings are available for free through Bootstrap. Check them out here: http://glyphicons.com/ -->
+    </div>
+</div>
 
 </body>
 </html>

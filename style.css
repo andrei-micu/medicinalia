@@ -1,5 +1,9 @@
 .container-navbar {
     background-color: #50b200;
+    box-shadow: 0px -5px 5px 5px #999;
+    -moz-box-shadow: 0px -5px 5px 5px #999;
+    -webkit-box-shadow: 0px -5px 5px 5px #999;
+    border-width: 0px;
 }
 
 .logo {
@@ -71,11 +75,73 @@
     margin-top: 80px;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
+.ad-bar {
+    background-color: #DDD;
+    min-height: 72px;
+    max-height: 72px;
+    height: 72px;
+    line-height: 72px;
+}
+
+.ad-bar.ng-hide-add.ng-hide-add-active,
+.ad-bar.ng-hide-remove.ng-hide-remove-active {
+    -webkit-transition: all 0.3s linear 0s;
+    transition: all 0.3s linear 0s;
+}
+.ad-bar.ng-hide {
+    min-height: 0px;
+    max-height: 0px;
+    height: 0px;
+    line-height: 0px;
+}
+
 .plant-thumbnail {
     max-width: 256px;
     max-height: 256px;
+    border-radius: 3px;
 }
 
-.plant-row{
-    cursor: pointer;
+.plant-thumbnail-ad-bar-container {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.plant-thumbnail-ad-bar {
+    max-width: 128px;
+    max-height: 64px;
+    border-radius: 3px;
+}
+
+.ad-text-container {
+    width: 75%;
+    height: 72px;
+    line-height: 72px;
+}
+
+.ad-text {
+    margin-left: 15px;
+    word-wrap: break-word;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 24px;
+}
+
+.close-ad-button-container {
+    margin-right: 15px;
+    height: 100%;
+    line-height: 72px;
+}
+
+.close-ad-button {
+    background-color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    font-size: 20px;
+    margin-top: 16px;
+    line-height: 45px;
 }
