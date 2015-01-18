@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="poc">
+<html ng-app="medicinalia">
 <head lang="en">
     <meta charset="UTF-8">
 
@@ -14,18 +14,20 @@
     <script type="application/javascript" src="js/angular.js"></script>
     <script type="application/javascript" src="js/angular-animate.js"></script>
     <script type="application/javascript" src="js/angular-mocks.js"></script>
+    <script type="application/javascript" src="js/ui-bootstrap-tpls-0.12.0.js"></script>
 
     <script type="application/javascript" src="js/json2.js"></script>
     <script type="application/javascript" src="js/minify.json.js"></script>
+
     <script type="application/javascript" src="app.js"></script>
 
-    <title>Medicinalia - Proof of Concept</title>
+    <title>Medicinalia</title>
 
     <meta name="keywords" content="project, infoiasi, wade, web"/>
 </head>
-<body ng-controller="SearchController as searchCtrl">
+<body ng-controller="MainController as mainCtrl">
 
-<div class="navbar navbar-fixed-top">
+<div class="navbar navbar-fixed-top" ng-class="{blurred : modalOpen}">
     <div class="container-fluid container-navbar">
         <img src="medicinalia-logo.png" class="navbar-brand logo"/>
 
@@ -38,7 +40,7 @@
     </div>
 </div>
 
-<div class="container search-results-container">
+<div class="container search-results-container" ng-class="{blurred : modalOpen}">
     <table class="table table-hover" ng-show="searchResults.results">
         <thead>
         <tr>
@@ -48,8 +50,10 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="searchResultId in searchResults.results" ng-show="searchResultsData[searchResultId]" class="clickable">
-            <td><img ng-src="{{searchResultsData[searchResultId].photo_links[0]}}" class="plant-thumbnail"/></td>
+        <tr ng-repeat="searchResultId in searchResults.results" ng-show="searchResultsData[searchResultId]"
+            class="clickable" ng-click="openPlantDetailsWindow(searchResultId)">
+
+            <td><img ng-src="{{searchResultsData[searchResultId].photo_links[0]}}" class="plant-thumbnail-search"/></td>
             <td>{{searchResultsData[searchResultId].name}}</td>
             <td>{{searchResultsData[searchResultId].description}}</td>
         </tr>
@@ -57,7 +61,7 @@
     </table>
 </div>
 
-<div class="navbar navbar-fixed-bottom ad-bar" ng-show="showAdBar">
+<div class="navbar navbar-fixed-bottom ad-bar" ng-show="showAdBar" ng-class="{blurred : modalOpen}">
     <div class="container-fluid">
         <div class="nav plant-thumbnail-ad-bar-container pull-left">
             <img class="plant-thumbnail-ad-bar"
@@ -83,6 +87,37 @@
         <!-- Glyphicons Halflings are available for free through Bootstrap. Check them out here: http://glyphicons.com/ -->
     </div>
 </div>
+
+<script type="text/ng-template" id="plant-details-template.html">
+
+    <div class="modal-header">
+        <h3 class="modal-title">{{ plantData.name }}</h3>
+    </div>
+
+    <div class="modal-body">
+        <div class="modal-container">
+
+            <div class="modal-gallery col-xs-3">
+                <img ng-repeat="plantImage in plantData.photo_links" ng-src="{{plantImage}}" class="plant-thumbnail-details" />
+            </div>
+
+            <div class="modal-details col-xs-9">
+                <tabset type="pills">
+                    <tab heading="Description">
+                        {{plantData.description}}
+                    </tab>
+                    <tab heading="Other">
+                        Bla bla
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-success" ng-click="close()">Close</button>
+    </div>
+</script>
 
 </body>
 </html>

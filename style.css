@@ -1,3 +1,7 @@
+a, a:active, a:focus {
+    outline: none;
+}
+
 .container-navbar {
     background-color: #50b200;
     box-shadow: 0px -5px 5px 5px #999;
@@ -92,6 +96,7 @@
     -webkit-transition: all 0.3s linear 0s;
     transition: all 0.3s linear 0s;
 }
+
 .ad-bar.ng-hide {
     min-height: 0px;
     max-height: 0px;
@@ -99,10 +104,17 @@
     line-height: 0px;
 }
 
-.plant-thumbnail {
-    max-width: 256px;
-    max-height: 256px;
+.plant-thumbnail-search {
+    max-width: 192px;
+    max-height: 192px;
     border-radius: 3px;
+}
+
+@media (min-width: 768px) {
+    .plant-thumbnail-search {
+        max-width: 256px;
+        max-height: 256px;
+    }
 }
 
 .plant-thumbnail-ad-bar-container {
@@ -144,4 +156,59 @@
     font-size: 20px;
     margin-top: 16px;
     line-height: 45px;
+}
+
+/* Fix for modal window not showing backdrop: https://github.com/angular-ui/bootstrap/pull/3117 */
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+}
+
+.modal-backdrop {
+    bottom: 0;
+}
+/* End of fix */
+
+.modal-container {
+    height: 65vh;
+}
+
+.modal-gallery {
+    height: 100%;
+    overflow: auto;
+}
+
+.modal-details {
+    height: 100%;
+    padding-top: 5px;
+    padding-left: 20px;
+    padding-right: 5px;
+}
+
+.modal-details .ng-isolate-scope{
+    height: 100%;
+}
+
+.plant-thumbnail-details {
+    max-width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 3px;
+}
+
+.tab-content {
+    overflow: auto;
+    height: 85%;
+    padding: 10px;
+}
+
+.blurred {
+    -webkit-filter: blur(2px);
+    -moz-filter: blur(2px);
+    -o-filter: blur(2px);
+    -ms-filter: blur(2px);
+    filter: blur(2px);
 }
