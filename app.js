@@ -8,6 +8,10 @@
         $scope.searchResultsData = {};
         $scope.selectedPlantId = 0;
         $scope.modalOpen = false;
+        $scope.sortingOptions = {
+            column: 'name',
+            descending: true
+        };
 
         $scope.performSearch = function (searchString){
             $http.jsonp(serverUrl+"/plants/searches")
@@ -37,7 +41,7 @@
             $scope.modalOpen = true;
             $scope.selectedPlantId = plantId;
 
-            $modal.open({
+            var modalInstance = $modal.open({
                 templateUrl: 'plant-details-template.html',
                 controller: 'PlantDetailsWindowController',
                 size: 'lg',
@@ -47,6 +51,57 @@
                     }
                 }
             });
+
+            modalInstance.result.then(function (selectedItem) {
+                $scope.modalOpen = false;
+            }, function () {
+                $scope.modalOpen = false;
+            });
+        };
+
+        $scope.getCaretClassForColumn = function(columnName){
+            if(columnName == $scope.sortingOptions.column){
+                return $scope.sortingOptions.descending ? 'caret caret-reversed' : 'caret';
+            }
+        };
+
+        $scope.getColorClassForColumn = function(columnName){
+            if(columnName == $scope.sortingOptions.column){
+                return 'sort-active clickable';
+            }
+            return 'clickable';
+        };
+
+        $scope.changeSorting = function(columnName){
+            var sortingOptions = $scope.sortingOptions;
+
+            if (sortingOptions.column == columnName) {
+                sortingOptions.descending = !sortingOptions.descending;
+            } else {
+                sortingOptions.column = columnName;
+                sortingOptions.descending = false;
+            }
+        };
+
+    });
+
+    app.filter('sortUsingOptions', function () {
+        return function (items, options, searchResultsData) {
+            if(items){
+                return items.sort(function(firstId, secondId){
+                    var firstPlant = searchResultsData[firstId];
+                    var secondPlant = searchResultsData[secondId];
+
+                    if(firstPlant && secondPlant){
+                        var firstField = firstPlant[options.column].toLowerCase();
+                        var secondField = secondPlant[options.column].toLowerCase();
+
+                        if(firstField < secondField) return options.descending ? -1 : 1;
+                        if(firstField > secondField) return options.descending ? 1 : -1;
+                    }
+                    return 0;
+                });
+            }
         };
     });
 
@@ -54,7 +109,6 @@
         $scope.plantData = parentScope.searchResultsData[parentScope.selectedPlantId];
 
         $scope.close = function () {
-            parentScope.modalOpen = false;
             $modalInstance.close();
         };
     });
@@ -66,8 +120,8 @@
     app.run(function ($httpBackend) {
             $httpBackend.whenJSONP('/plants/searches').respond({
                 results: [
-                    "id1",
                     "id2",
+                    "id1",
                     "id3"
                 ]
             });
