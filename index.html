@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/bootstrap-theme.css">
     <link rel="stylesheet" href="css/ng-tags-input.css">
     <link rel="stylesheet" href="css/ng-tags-input.bootstrap.css">
+    <link rel="stylesheet" href="css/bootstrap-multiselect.css">
 
     <link rel="stylesheet" href="style.css">
 
@@ -19,6 +20,7 @@
     <script type="application/javascript" src="js/angular-mocks.js"></script>
     <script type="application/javascript" src="js/ui-bootstrap-tpls-0.12.0.js"></script>
     <script type="application/javascript" src="js/ng-tags-input.js"></script>
+    <script type="application/javascript" src="js/bootstrap-multiselect.js"></script>
 
     <script type="application/javascript" src="js/json2.js"></script>
     <script type="application/javascript" src="js/minify.json.js"></script>
@@ -37,13 +39,13 @@
         <img src="medicinalia-logo.png" class="navbar-brand logo"/>
 
 
-        <form class="search-form" role="search" ng-submit="performSearch(form.searchString)" novalidate>
+        <form class="search-form" role="search" ng-submit="performSearch(searchObject)" novalidate>
 
-            <tags-input class="search-textbox" ng-model="form.searchString" min-length="1" replace-spaces-with-dashes="false"
+            <tags-input class="search-textbox" ng-model="searchObject" min-length="1" replace-spaces-with-dashes="false"
                         placeholder="Type a name or add a constraint, then press Search ...">
             </tags-input>
 
-            <button type="submit" class="search-button" ng-disabled="!form.searchString">Search</button>
+            <button type="submit" class="search-button" ng-disabled="isSearchInvalid(searchObject)">Search</button>
         </form>
     </div>
 </div>
@@ -58,20 +60,13 @@
                 Name
                 <span ng-class="getCaretClassForColumn('name')"></span>
             </th>
-            <th>Description</th>
+            <th ng-show="shownHeaders.description">Description</th>
+            <th ng-show="shownHeaders.vitcMg">Vitamin-C</th>
             <th>
-                <div class="btn-group" dropdown>
-                    <button type="button" class="btn dropdown-toggle" dropdown-toggle>
-                        <span class="glyphicon glyphicon-plus sort-active" aria-hidden="true"></span> <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                        <li><a href="#">Action</a></li>
-                        <li><a href="#">Another action</a></li>
-                        <li><a href="#">Something else here</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">Separated link</a></li>
-                    </ul>
-                </div>
+                <select id="headers-dropdown" multiple="multiple">
+                    <option value="description" selected="selected">Description</option>
+                    <option value="vitcMg">Vitamin-C</option>
+                </select>
             </th>
         </tr>
         </thead>
@@ -82,7 +77,10 @@
 
             <td><img ng-src="{{searchResultsData[searchResultId].photo_links[0]}}" class="plant-thumbnail-search"/></td>
             <td>{{searchResultsData[searchResultId].name}}</td>
-            <td>{{searchResultsData[searchResultId].description}}</td>
+            <td ng-show="shownHeaders.description">{{searchResultsData[searchResultId].description}}</td>
+            <td ng-show="shownHeaders.vitcMg" class="text-center">
+                {{searchResultsData[searchResultId].metadata.vitamins.vitcMg | showMilligramsPer100Grams}}
+            </td>
             <td></td>
         </tr>
         </tbody>

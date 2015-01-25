@@ -251,3 +251,15 @@ a, a:active, a:focus {
 .sort-active {
     color: #50b200;
 }
+
+.headers-selected {
+    background-color: #50b200;
+}
+
+.headers-selected a label {
+    color: white;
+}
+
+.headers-selected a:hover label {
+    color: black;
+}

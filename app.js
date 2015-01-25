@@ -19,6 +19,23 @@
             column: 'name',
             descending: true
         };
+        $scope.shownHeaders = {
+            description: true,
+            vitcMg: false
+        };
+
+        $('#headers-dropdown').multiselect({
+            dropRight: true,
+            buttonClass: 'btn',
+            selectedClass: 'headers-selected',
+            buttonText: function(options, select) {
+                return '<span class="glyphicon glyphicon-plus sort-active" aria-hidden="true"></span>';
+            },
+            onChange: function(option, checked, select) {
+                $scope.shownHeaders[$(option).val()] = checked;
+                $scope.$digest();
+            }
+        });
 
         function searchObjectToQueryParams(searchObject) {
             var queryParamsObject = {
@@ -27,6 +44,11 @@
             };
 
             return "?" + $.param(queryParamsObject);
+        };
+
+        $scope.isSearchInvalid = function (searchObject) {
+            return false;
+            //return (!searchObject) || searchObject.length <= 0;
         };
 
         $scope.performSearch = function (searchObject) {
@@ -114,16 +136,28 @@
                     var secondPlant = searchResultsData[secondId];
 
                     if (firstPlant && secondPlant) {
-                        var firstField = firstPlant[options.column].toLowerCase();
-                        var secondField = secondPlant[options.column].toLowerCase();
-
-                        if (firstField < secondField) return options.descending ? -1 : 1;
-                        if (firstField > secondField) return options.descending ? 1 : -1;
+                        if(options.column == 'name'){
+                            return comparePlantsByName(firstPlant, secondPlant, options);
+                        }
                     }
                     return 0;
                 });
             }
         };
+
+        function comparePlantsByName(firstPlant, secondPlant, options){
+            var firstField = firstPlant[options.column].toLowerCase();
+            var secondField = secondPlant[options.column].toLowerCase();
+
+            if (firstField < secondField) return options.descending ? -1 : 1;
+            if (firstField > secondField) return options.descending ? 1 : -1;
+        }
+    });
+
+    app.filter('showMilligramsPer100Grams', function () {
+        return function (item) {
+            return item ? item + 'mg / 100g' : '';
+        }
     });
 
     app.controller('PlantDetailsWindowController', function ($scope, $modalInstance, parentScope) {
