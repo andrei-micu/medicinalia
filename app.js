@@ -3,7 +3,12 @@
 
     var serverUrl = useMocks ? "" : "http://medicinalia.geton.ro/api";
 
-    var app = angular.module("medicinalia", ["ngAnimate", "ui.bootstrap", useMocks ? "medicinalia-mocks" : ""]);
+    var injectedModules = ["ngTagsInput", "ngAnimate", "ui.bootstrap"];
+    if(useMocks){
+        injectedModules.push("medicinalia-mocks");
+    }
+
+    var app = angular.module("medicinalia", injectedModules);
 
     app.controller("MainController", function ($scope, $http, $modal) {
         $scope.searchResults = {};
@@ -15,17 +20,17 @@
             descending: true
         };
 
-        function searchStringToQueryParams(searchString) {
+        function searchObjectToQueryParams(searchObject) {
             var queryParamsObject = {
                 callback: "JSON_CALLBACK",
-                name: searchString
+                name: searchObject[0].text
             };
 
             return "?" + $.param(queryParamsObject);
         };
 
-        $scope.performSearch = function (searchString) {
-            var queryUrl = serverUrl + "/plants/search" + searchStringToQueryParams(searchString);
+        $scope.performSearch = function (searchObject) {
+            var queryUrl = serverUrl + "/plants/search" + searchObjectToQueryParams(searchObject);
 
             $http.jsonp(queryUrl)
                 .success(function (data) {
@@ -60,6 +65,7 @@
                 templateUrl: 'plant-details-template.html',
                 controller: 'PlantDetailsWindowController',
                 size: 'lg',
+                backdrop: false,
                 resolve: {
                     parentScope: function () {
                         return $scope;

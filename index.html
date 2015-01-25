@@ -5,6 +5,9 @@
 
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/bootstrap-theme.css">
+    <link rel="stylesheet" href="css/ng-tags-input.css">
+    <link rel="stylesheet" href="css/ng-tags-input.bootstrap.css">
+
     <link rel="stylesheet" href="style.css">
 
 
@@ -15,6 +18,7 @@
     <script type="application/javascript" src="js/angular-animate.js"></script>
     <script type="application/javascript" src="js/angular-mocks.js"></script>
     <script type="application/javascript" src="js/ui-bootstrap-tpls-0.12.0.js"></script>
+    <script type="application/javascript" src="js/ng-tags-input.js"></script>
 
     <script type="application/javascript" src="js/json2.js"></script>
     <script type="application/javascript" src="js/minify.json.js"></script>
@@ -32,10 +36,13 @@
     <div class="container-fluid container-navbar">
         <img src="medicinalia-logo.png" class="navbar-brand logo"/>
 
-        <form class="search-form" role="search"
-              ng-submit="performSearch(form.searchString)" novalidate>
-            <input type="text" class="search-textbox" placeholder="Type a name or constraint ..."
-                   ng-model="form.searchString">
+
+        <form class="search-form" role="search" ng-submit="performSearch(form.searchString)" novalidate>
+
+            <tags-input class="search-textbox" ng-model="form.searchString" min-length="1" replace-spaces-with-dashes="false"
+                        placeholder="Type a name or add a constraint, then press Search ...">
+            </tags-input>
+
             <button type="submit" class="search-button" ng-disabled="!form.searchString">Search</button>
         </form>
     </div>
@@ -57,7 +64,7 @@
                     <button type="button" class="btn dropdown-toggle" dropdown-toggle>
                         <span class="glyphicon glyphicon-plus sort-active" aria-hidden="true"></span> <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" role="menu">
+                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
                         <li><a href="#">Action</a></li>
                         <li><a href="#">Another action</a></li>
                         <li><a href="#">Something else here</a></li>

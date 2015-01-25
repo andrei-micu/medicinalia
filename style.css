@@ -38,9 +38,37 @@ a, a:active, a:focus {
     display: inline-block;
     border-radius: 10px;
     border: #FFFFFF;
-    padding: 10px;
     font-size: 16px;
     font-weight: bold;
+    overflow: hidden;
+}
+
+.search-textbox .host {
+    width:5000px;
+}
+
+.search-textbox .host .tags{
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.search-textbox .host .tags .tag-list .tag-item {
+    font-size: 16px;
+    background-color: #50b200;
+    border-color: #50b200;
+}
+
+.search-textbox .host .tags .tag-list .tag-item.selected {
+    background-color: #D9534F;
+    border-color: #D9534F;
+}
+
+.search-textbox .host .tags .tag-list .tag-item .remove-button {
+    font-size: 22px;
+}
+
+.search-textbox .host .input {
+    font-size: 16px;
 }
 
 .search-button {
@@ -158,19 +186,17 @@ a, a:active, a:focus {
     line-height: 45px;
 }
 
-/* Fix for modal window not showing backdrop: https://github.com/angular-ui/bootstrap/pull/3117 */
-html {
-    height: 100%;
+@media (min-width: 768px) {
+    .modal-dialog {
+        width: 85%;
+    }
 }
 
-body {
-    min-height: 100%;
+@media (min-width: 1024px) {
+    .modal-dialog {
+        width: 75%;
+    }
 }
-
-.modal-backdrop {
-    bottom: 0;
-}
-/* End of fix */
 
 .modal-container {
     height: 65vh;
