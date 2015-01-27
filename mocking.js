@@ -37,7 +37,7 @@
                 ],
                 "metadata": {
                     "vitamins": {
-                        "vitcMg" : 4.2
+                        "VitcMg" : 4.2
                     }
                 }
             });

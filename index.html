@@ -36,7 +36,7 @@
 
 <div class="navbar navbar-fixed-top" ng-class="{blurred : modalOpen}">
     <div class="container-fluid container-navbar">
-        <img src="medicinalia-logo.png" class="navbar-brand logo"/>
+        <img src="images/medicinalia-logo.png" class="navbar-brand logo"/>
 
 
         <form class="search-form" role="search" ng-submit="performSearch(searchObject)" novalidate>
@@ -102,13 +102,13 @@
             ng-show="searchResultsData[searchResultId]"
             class="clickable" ng-click="openPlantDetailsWindow(searchResultId)">
 
-            <td><img ng-src="{{searchResultsData[searchResultId].photo_links[0]}}" class="plant-thumbnail-search"/></td>
+            <td><img ng-src="{{searchResultsData[searchResultId].photo_links[0] | thumbnailWithDefault}}" class="plant-thumbnail-search"/></td>
             <td>{{searchResultsData[searchResultId].name}}</td>
             <td ng-show="shownHeaders.description">{{searchResultsData[searchResultId].description}}</td>
             <td ng-show="shownHeaders.vitcMg" class="text-center">
-                {{searchResultsData[searchResultId].metadata.vitamins.vitcMg | showMilligramsPer100Grams}}
+                {{searchResultsData[searchResultId].metadata.vitamins.VitcMg | showMilligramsPer100Grams}}
             </td>
-            <td></td>
+            <td>{{searchResultId}}</td>
         </tr>
         </tbody>
     </table>
@@ -117,13 +117,16 @@
 <div class="navbar navbar-fixed-bottom ad-bar" ng-show="showAdBar" ng-class="{blurred : modalOpen}">
     <div class="container-fluid">
         <div class="nav plant-thumbnail-ad-bar-container pull-left">
-            <img class="plant-thumbnail-ad-bar"
-                 src="https://www.googleapis.com/freebase/v1/image/m/02f8wvh?key=AIzaSyCQVC9yA72POMg2VjiQhSJQQP1nf3ToZTs&maxwidth=960"/>
+            <img class="plant-thumbnail-ad-bar clickable" ng-click="openPlantDetailsWindow(adBarPlantId)"
+                 ng-src="{{searchResultsData[adBarPlantId].photo_links[0] | thumbnailWithDefault}}"/>
         </div>
 
         <div class="nav ad-text-container pull-left">
             <span class="ad-text">
-                Since we're in the cold season, Medicinalia recommends you <strong>Chamomile</strong>!
+                Since we're in the cold season, Medicinalia recommends you
+                <strong class="green-font clickable" ng-click="openPlantDetailsWindow(adBarPlantId)">
+                    {{searchResultsData[adBarPlantId].name}}
+                </strong>!
                 This plant is known for containing a high amount of Vitamin C, which will keep your immune system
                 up-and-running.
             </span>
@@ -131,7 +134,7 @@
 
         <div class="nav navbar-right pull-right">
             <div class="close-ad-button-container">
-                <div class="close-ad-button clickable text-center" aria-label="Close" ng-click="showAdBar=0" ng-init="showAdBar=1">
+                <div class="close-ad-button clickable text-center" aria-label="Close" ng-click="showAdBar=false">
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 (function () {
-    var useMocks = true;
+    var useMocks = false;
+    var noisy = false;
 
     var serverUrl = useMocks ? "" : "http://medicinalia.geton.ro/api";
 
@@ -10,7 +11,7 @@
 
     var app = angular.module("medicinalia", injectedModules);
 
-    app.controller("MainController", function ($scope, $http, $modal) {
+    app.controller("MainController", function ($scope, $http, $modal, $timeout) {
         $scope.searchTextBox = $('#search-textbox');
         $scope.searchResults = {};
         $scope.searchResultsData = {};
@@ -24,6 +25,9 @@
             description: true,
             vitcMg: false
         };
+        $scope.showAdBar = false;
+        $scope.showAdBarDelay = 0;
+        $scope.adBarPlantId = "";
         $scope.filterData = {
             zone : {
                 friendlyName: 'Zone',
@@ -44,7 +48,7 @@
             buttonClass: 'btn',
             selectedClass: 'headers-selected',
             buttonText: function(options, select) {
-                return '<span class="glyphicon glyphicon-th-list sort-active" aria-hidden="true"></span>';
+                return '<span class="glyphicon glyphicon-th-list green-font" aria-hidden="true"></span>';
             },
             onChange: function(option, checked, select) {
                 $scope.shownHeaders[$(option).val()] = checked;
@@ -77,7 +81,7 @@
                     });
                 })
                 .error(function (data, status, headers, config) {
-                    alert("Error fetching search results: { queryUrl: " + queryUrl + " status: " + status + ", data: " + data + " }");
+                    noisy && alert("Error fetching search results: { queryUrl: " + queryUrl + " status: " + status + ", data: " + data + " }");
                 });
         };
 
@@ -89,7 +93,7 @@
                     $scope.searchResultsData[plantId] = data;
                 })
                 .error(function (data, status, headers, config) {
-                    alert("Error fetching plant data: " + status + " " + data);
+                    noisy && alert("Error fetching plant data: " + status + " " + data);
                 });
         };
 
@@ -124,7 +128,7 @@
 
         $scope.getColorClassForColumn = function (columnName) {
             if (columnName == $scope.sortingOptions.column) {
-                return 'sort-active clickable';
+                return 'green-font clickable';
             }
             return 'clickable';
         };
@@ -146,7 +150,72 @@
             $scope.searchObject.push({
                 text: friendlyName + ": " + value
             });
-        }
+        };
+
+        /* Search plants with high Vitamin C for the ad */
+        $timeout(function (){
+            var searchObject = [{ name: "" }];
+            var queryUrl = serverUrl + "/plants/search" + searchObjectToQueryParams(searchObject);
+            var plantQueriesToDo = NaN;
+            var plantQueriesFinished = 0;
+            var resultsWithVitC = [];
+
+            $http.jsonp(queryUrl)
+                .success(function (data) {
+                    plantQueriesToDo = data.length;
+                    data.forEach(function (plantId) {
+                        fetchVitaminC(plantId);
+                    });
+                })
+                .error(function (data, status, headers, config) {
+                    noisy && alert("Error fetching search results: { queryUrl: " + queryUrl + " status: " + status + ", data: " + data + " }");
+                });
+
+            var fetchVitaminC = function (plantId){
+                var queryUrl = serverUrl + "/" + plantId + "/plants?callback=JSON_CALLBACK";
+
+                $http.jsonp(queryUrl)
+                    .success(function (data) {
+                        if(data && data.metadata && data.metadata.vitamins && data.metadata.vitamins.VitcMg){
+                            resultsWithVitC.push({
+                                id: plantId,
+                                vitcMg: data.metadata.vitamins.VitcMg
+                            });
+                        }
+                        handlePlantQueryUpdate();
+                    })
+                    .error(function (data, status, headers, config) {
+                        noisy && alert("Error fetching plant data: " + status + " " + data);
+                        handlePlantQueryUpdate();
+                    });
+            };
+
+            var handlePlantQueryUpdate = function () {
+                plantQueriesFinished++;
+
+                if (plantQueriesToDo == plantQueriesFinished) {
+                    resultsWithVitC.sort(function (firstEntry, secondEntry) {
+                        return secondEntry.vitcMg - firstEntry.vitcMg;
+                    });
+
+                    var randomTop7 = Math.floor(Math.random() * 6.5);
+                    var chosenPlantIndex = randomTop7 < resultsWithVitC.length ? randomTop7 : resultsWithVitC.length - 1;
+                    var chosenPlantId = resultsWithVitC[chosenPlantIndex].id;
+                    var queryUrl = serverUrl + "/" + chosenPlantId + "/plants?callback=JSON_CALLBACK";
+
+                    $http.jsonp(queryUrl)
+                        .success(function (data) {
+                            $scope.searchResultsData[chosenPlantId] = data;
+                            $scope.adBarPlantId = chosenPlantId;
+                            $scope.showAdBar = true;
+                        })
+                        .error(function (data, status, headers, config) {
+                            noisy && alert("Error fetching plant data: " + status + " " + data);
+                        });
+                }
+            };
+
+        }, $scope.showAdBarDelay);
 
     });
 
@@ -173,12 +242,19 @@
 
             if (firstField < secondField) return options.descending ? -1 : 1;
             if (firstField > secondField) return options.descending ? 1 : -1;
+            return 0;
         }
     });
 
     app.filter('showMilligramsPer100Grams', function () {
         return function (item) {
             return item ? item + 'mg / 100g' : '';
+        }
+    });
+
+    app.filter('thumbnailWithDefault', function () {
+        return function (pictureLink) {
+            return pictureLink ? pictureLink : 'images/no-photo.png';
         }
     });
 
