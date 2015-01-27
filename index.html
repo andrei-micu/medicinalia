@@ -41,11 +41,33 @@
 
         <form class="search-form" role="search" ng-submit="performSearch(searchObject)" novalidate>
 
-            <tags-input class="search-textbox" ng-model="searchObject" min-length="1" replace-spaces-with-dashes="false"
+            <tags-input id="search-textbox" class="search-textbox" ng-model="searchObject" min-length="1" replace-spaces-with-dashes="false"
                         placeholder="Type a name or add a constraint, then press Search ...">
             </tags-input>
 
-            <button type="submit" class="search-button" ng-disabled="isSearchInvalid(searchObject)">Search</button>
+            <div class="btn-group filter-button-container" dropdown>
+                <button type="button" class="dropdown-toggle filter-button" dropdown-toggle>
+                    <span class="glyphicon glyphicon-filter"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right filter-dropdown" role="menu" stop-event="click keydown">
+                    <li ng-repeat="(filterName, filterValues) in filterData">
+                        <div class="filter-input">
+                            <div class="input-group">
+                                <span class="input-group-addon">{{filterValues.friendlyName}}:</span>
+                                <input type="text" class="form-control" ng-model="filterData[filterName].value"/>
+                            </div>
+                        </div>
+                        <button type="button" class="btn filter-input-button" ng-click="addFilter(searchObject, filterName)"
+                                ng-disabled="!filterData[filterName].value">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <button type="submit" class="search-button" ng-disabled="isSearchInvalid(searchObject)">
+                Search
+            </button>
         </form>
     </div>
 </div>
@@ -61,7 +83,12 @@
                 <span ng-class="getCaretClassForColumn('name')"></span>
             </th>
             <th ng-show="shownHeaders.description">Description</th>
-            <th ng-show="shownHeaders.vitcMg">Vitamin-C</th>
+            <th ng-show="shownHeaders.vitcMg"
+                ng-click="changeSorting('vtcMg')"
+                ng-class="getColorClassForColumn('vtcMg')">
+                Vitamin-C
+                <span ng-class="getCaretClassForColumn('vtcMg')"></span>
+            </th>
             <th>
                 <select id="headers-dropdown" multiple="multiple">
                     <option value="description" selected="selected">Description</option>

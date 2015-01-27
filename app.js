@@ -11,6 +11,7 @@
     var app = angular.module("medicinalia", injectedModules);
 
     app.controller("MainController", function ($scope, $http, $modal) {
+        $scope.searchTextBox = $('#search-textbox');
         $scope.searchResults = {};
         $scope.searchResultsData = {};
         $scope.selectedPlantId = 0;
@@ -23,13 +24,27 @@
             description: true,
             vitcMg: false
         };
+        $scope.filterData = {
+            zone : {
+                friendlyName: 'Zone',
+                value: ''
+            },
+            forDisease : {
+                friendlyName: 'For disease',
+                value: ''
+            },
+            dietaryRestriction : {
+                friendlyName: 'Dietary restriction',
+                value: ''
+            }
+        };
 
         $('#headers-dropdown').multiselect({
             dropRight: true,
             buttonClass: 'btn',
             selectedClass: 'headers-selected',
             buttonText: function(options, select) {
-                return '<span class="glyphicon glyphicon-plus sort-active" aria-hidden="true"></span>';
+                return '<span class="glyphicon glyphicon-th-list sort-active" aria-hidden="true"></span>';
             },
             onChange: function(option, checked, select) {
                 $scope.shownHeaders[$(option).val()] = checked;
@@ -47,8 +62,7 @@
         };
 
         $scope.isSearchInvalid = function (searchObject) {
-            return false;
-            //return (!searchObject) || searchObject.length <= 0;
+            return (!searchObject) || (searchObject.length <= 0 && !$($scope.searchTextBox).find('.tags .input').val());
         };
 
         $scope.performSearch = function (searchObject) {
@@ -126,6 +140,14 @@
             }
         };
 
+        $scope.addFilter = function (searchObject, filter){
+            var friendlyName = $scope.filterData[filter].friendlyName;
+            var value = $scope.filterData[filter].value;
+            $scope.searchObject.push({
+                text: friendlyName + ": " + value
+            });
+        }
+
     });
 
     app.filter('sortUsingOptions', function () {
@@ -158,6 +180,17 @@
         return function (item) {
             return item ? item + 'mg / 100g' : '';
         }
+    });
+
+    app.directive('stopEvent', function () {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attr) {
+                element.bind(attr.stopEvent, function (e) {
+                    e.stopPropagation();
+                });
+            }
+        };
     });
 
     app.controller('PlantDetailsWindowController', function ($scope, $modalInstance, parentScope) {
