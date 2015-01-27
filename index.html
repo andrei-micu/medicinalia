@@ -21,6 +21,7 @@
     <script type="application/javascript" src="js/ui-bootstrap-tpls-0.12.0.js"></script>
     <script type="application/javascript" src="js/ng-tags-input.js"></script>
     <script type="application/javascript" src="js/bootstrap-multiselect.js"></script>
+    <script type="application/javascript" src="js/bootstrap-typeahead.js"></script>
 
     <script type="application/javascript" src="js/json2.js"></script>
     <script type="application/javascript" src="js/minify.json.js"></script>
@@ -45,16 +46,17 @@
                         placeholder="Type a name or add a constraint, then press Search ...">
             </tags-input>
 
-            <div class="btn-group filter-button-container" dropdown>
+            <div class="btn-group filter-button-container" dropdown
+                    ng-init="initAutocompleteValues()">
                 <button type="button" class="dropdown-toggle filter-button" dropdown-toggle>
                     <span class="glyphicon glyphicon-filter"></span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-right filter-dropdown" role="menu" stop-event="click keydown">
-                    <li ng-repeat="(filterName, filterValues) in filterData">
+                <ul class="dropdown-menu dropdown-menu-right filter-dropdown" role="menu" stop-event="click">
+                    <li ng-repeat="(filterName, filterValue) in filterData">
                         <div class="filter-input">
                             <div class="input-group">
-                                <span class="input-group-addon">{{filterValues.friendlyName}}:</span>
-                                <input type="text" class="form-control" ng-model="filterData[filterName].value"/>
+                                <span class="input-group-addon">{{filterValue.friendlyName}}:</span>
+                                <input id="{{'input'+filterName}}" type="text" class="form-control" ng-model="filterData[filterName].value" />
                             </div>
                         </div>
                         <button type="button" class="btn filter-input-button" ng-click="addFilter(searchObject, filterName)"
@@ -84,15 +86,26 @@
             </th>
             <th ng-show="shownHeaders.description">Description</th>
             <th ng-show="shownHeaders.vitcMg"
-                ng-click="changeSorting('vtcMg')"
-                ng-class="getColorClassForColumn('vtcMg')">
-                Vitamin-C
-                <span ng-class="getCaretClassForColumn('vtcMg')"></span>
+                ng-click="changeSorting('VitcMg')"
+                ng-class="getColorClassForColumn('VitcMg')">
+                Vitamin-C<span ng-class="getCaretClassForColumn('VitcMg')"></span>
+            </th>
+            <th ng-show="shownHeaders.calciumMg"
+                ng-click="changeSorting('CalciumMg')"
+                ng-class="getColorClassForColumn('CalciumMg')">
+                Calcium<span ng-class="getCaretClassForColumn('CalciumMg')"></span>
+            </th>
+            <th ng-show="shownHeaders.protein"
+                ng-click="changeSorting('Protein')"
+                ng-class="getColorClassForColumn('Protein')">
+                Proteins<span ng-class="getCaretClassForColumn('Protein')"></span>
             </th>
             <th>
                 <select id="headers-dropdown" multiple="multiple">
                     <option value="description" selected="selected">Description</option>
                     <option value="vitcMg">Vitamin-C</option>
+                    <option value="calciumMg">Calcium</option>
+                    <option value="protein">Proteins</option>
                 </select>
             </th>
         </tr>
@@ -108,7 +121,13 @@
             <td ng-show="shownHeaders.vitcMg" class="text-center">
                 {{searchResultsData[searchResultId].metadata.vitamins.VitcMg | showMilligramsPer100Grams}}
             </td>
-            <td>{{searchResultId}}</td>
+            <td ng-show="shownHeaders.calciumMg" class="text-center">
+                {{searchResultsData[searchResultId].metadata.vitamins.CalciumMg | showMilligramsPer100Grams}}
+            </td>
+            <td ng-show="shownHeaders.protein" class="text-center">
+                {{searchResultsData[searchResultId].metadata.vitamins.Protein | showMilligramsPer100Grams}}
+            </td>
+            <td></td>
         </tr>
         </tbody>
     </table>

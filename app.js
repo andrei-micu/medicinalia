@@ -2,9 +2,9 @@
     var useMocks = false;
     var noisy = false;
 
-    var serverUrl = useMocks ? "" : "http://medicinalia.geton.ro/api";
+    var serverUrl = useMocks ? "/" : "http://medicinalia.geton.ro/api/";
 
-    var injectedModules = ["ngTagsInput", "ngAnimate", "ui.bootstrap"];
+    var injectedModules = ["ui.bootstrap", "ngTagsInput", "ngAnimate"];
     if(useMocks){
         injectedModules.push("medicinalia-mocks");
     }
@@ -23,23 +23,56 @@
         };
         $scope.shownHeaders = {
             description: true,
-            vitcMg: false
+            vitcMg: false,
+            calciumMg: false,
+            protein: false
         };
         $scope.showAdBar = false;
         $scope.showAdBarDelay = 0;
         $scope.adBarPlantId = "";
         $scope.filterData = {
             zone : {
-                friendlyName: 'Zone',
-                value: ''
+                friendlyName: 'Found in zone',
+                value: '',
+                filterAutocomplete: []
             },
             forDisease : {
                 friendlyName: 'For disease',
-                value: ''
+                value: '',
+                filterAutocomplete: []
             },
             dietaryRestriction : {
                 friendlyName: 'Dietary restriction',
-                value: ''
+                value: '',
+                filterAutocomplete: []
+            }
+        };
+
+        $scope.initAutocompleteValues = function (){
+            var filterNameToQueryMap = {
+                zone : serverUrl + "zones?callback=JSON_CALLBACK",
+                forDisease : serverUrl + "diseases?callback=JSON_CALLBACK",
+                dietaryRestriction : serverUrl + "dietary-restrictions?callback=JSON_CALLBACK"
+            };
+
+            function setupTypeAhead(filterName) {
+                $http.jsonp(filterNameToQueryMap[filterName])
+                    .success(function (data) {
+                        $scope.filterData[filterName].filterAutocomplete = data;
+                        $("#input" + filterName).typeahead({
+                            source: function () {
+                                return $scope.filterData[filterName].filterAutocomplete;
+                            },
+                            items: 3
+                        });
+                    })
+                    .error(function (data, status, headers, config) {
+                        noisy && alert("Error fetching autocomplete data for "+ filterName+": " + status + " " + data);
+                    });
+            }
+
+            for(var filterName in filterNameToQueryMap){
+                setupTypeAhead(filterName);
             }
         };
 
@@ -63,14 +96,14 @@
             };
 
             return "?" + $.param(queryParamsObject);
-        };
+        }
 
         $scope.isSearchInvalid = function (searchObject) {
             return (!searchObject) || (searchObject.length <= 0 && !$($scope.searchTextBox).find('.tags .input').val());
         };
 
         $scope.performSearch = function (searchObject) {
-            var queryUrl = serverUrl + "/plants/search" + searchObjectToQueryParams(searchObject);
+            var queryUrl = serverUrl + "plants/search" + searchObjectToQueryParams(searchObject);
 
             $http.jsonp(queryUrl)
                 .success(function (data) {
@@ -86,7 +119,7 @@
         };
 
         $scope.fetchPlantData = function (plantId) {
-            var queryUrl = serverUrl + "/" + plantId + "/plants?callback=JSON_CALLBACK";
+            var queryUrl = serverUrl + plantId + "/plants?callback=JSON_CALLBACK";
 
             $http.jsonp(queryUrl)
                 .success(function (data) {
@@ -155,7 +188,7 @@
         /* Search plants with high Vitamin C for the ad */
         $timeout(function (){
             var searchObject = [{ name: "" }];
-            var queryUrl = serverUrl + "/plants/search" + searchObjectToQueryParams(searchObject);
+            var queryUrl = serverUrl + "plants/search" + searchObjectToQueryParams(searchObject);
             var plantQueriesToDo = NaN;
             var plantQueriesFinished = 0;
             var resultsWithVitC = [];
@@ -172,7 +205,7 @@
                 });
 
             var fetchVitaminC = function (plantId){
-                var queryUrl = serverUrl + "/" + plantId + "/plants?callback=JSON_CALLBACK";
+                var queryUrl = serverUrl + plantId + "/plants?callback=JSON_CALLBACK";
 
                 $http.jsonp(queryUrl)
                     .success(function (data) {
@@ -201,7 +234,7 @@
                     var randomTop7 = Math.floor(Math.random() * 6.5);
                     var chosenPlantIndex = randomTop7 < resultsWithVitC.length ? randomTop7 : resultsWithVitC.length - 1;
                     var chosenPlantId = resultsWithVitC[chosenPlantIndex].id;
-                    var queryUrl = serverUrl + "/" + chosenPlantId + "/plants?callback=JSON_CALLBACK";
+                    var queryUrl = serverUrl + chosenPlantId + "/plants?callback=JSON_CALLBACK";
 
                     $http.jsonp(queryUrl)
                         .success(function (data) {
@@ -229,6 +262,8 @@
                     if (firstPlant && secondPlant) {
                         if(options.column == 'name'){
                             return comparePlantsByName(firstPlant, secondPlant, options);
+                        } else {
+                            return comparePlantsByPercentages(firstPlant, secondPlant, options);
                         }
                     }
                     return 0;
@@ -243,6 +278,13 @@
             if (firstField < secondField) return options.descending ? -1 : 1;
             if (firstField > secondField) return options.descending ? 1 : -1;
             return 0;
+        }
+
+        function comparePlantsByPercentages(firstPlant, secondPlant, options){
+            var firstField = firstPlant.metadata.vitamins[options.column] || 0;
+            var secondField = secondPlant.metadata.vitamins[options.column] || 0;
+
+            return options.descending ? firstField - secondField : secondField - firstField;
         }
     });
 
