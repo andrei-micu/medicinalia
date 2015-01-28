@@ -2,6 +2,11 @@ a, a:active, a:focus {
     outline: none;
 }
 
+h4 {
+    color: #50b200;
+    margin-top: 15px;
+}
+
 .container-navbar {
     background-color: #50b200;
     box-shadow: 0px -5px 5px 5px #999;
@@ -281,6 +286,8 @@ a, a:active, a:focus {
     overflow: auto;
     height: 85%;
     padding: 10px;
+    padding-top: 0px;
+    margin-top: 10px;
 }
 
 .blurred {

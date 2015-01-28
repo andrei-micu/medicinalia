@@ -37,7 +37,7 @@
                 filterAutocomplete: []
             },
             forDisease : {
-                friendlyName: 'For disease',
+                friendlyName: 'Relative to disease',
                 value: '',
                 filterAutocomplete: []
             },
@@ -312,6 +312,7 @@
     });
 
     app.controller('PlantDetailsWindowController', function ($scope, $modalInstance, parentScope) {
+        $scope.plantId = parentScope.selectedPlantId;
         $scope.plantData = parentScope.searchResultsData[parentScope.selectedPlantId];
 
         $scope.close = function () {

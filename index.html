@@ -179,10 +179,40 @@
             <div class="modal-details col-xs-9">
                 <tabset type="pills">
                     <tab heading="Description">
-                        {{plantData.description}}
+                        <h4>Other names:</h4>
+                        <p ng-repeat="name in plantData.other_names">
+                            {{name}}
+                        </p>
+
+                        <h4>Description:</h4>
+                        <p>
+                            {{plantData.description}}
+                        </p>
+
+                        <h4>Information source:</h4>
+                        <p>
+                            {{ plantId[0] == 'd' ? 'DBPedia' : 'Freebase' }}
+                        </p>
                     </tab>
-                    <tab heading="Other">
-                        Bla bla
+                    <tab heading="Nutritional info">
+                        <h4>Vitamins / Minerals / Nutrients:</h4>
+                        <p>Calcium: {{ plantData.metadata.vitamins.CalciumMg | showMilligramsPer100Grams }}</p>
+                        <p>Proteins: {{ plantData.metadata.vitamins.Protein | showMilligramsPer100Grams }}</p>
+                        <p>Potassium: {{ plantData.metadata.vitamins.PotassiumMg | showMilligramsPer100Grams }}</p>
+                        <p>Magnesium: {{ plantData.metadata.vitamins.MagnesiumMg | showMilligramsPer100Grams }}</p>
+                        <p>Vitamin-C: {{ plantData.metadata.vitamins.VitcMg | showMilligramsPer100Grams }}</p>
+                        <p>Vitamin-E: {{ plantData.metadata.vitamins.ViteMg | showMilligramsPer100Grams }}</p>
+                        <p>Zinc: {{ plantData.metadata.vitamins.ZincMg | showMilligramsPer100Grams }}</p>
+
+                        <h4>Compatible dietary restrictions:</h4>
+                        <p ng-repeat="restiction in plantData.metadata.compatible_with_diatery_restrictions">
+                            {{restiction}}
+                        </p>
+
+                        <h4>Incompatible dietary restrictions:</h4>
+                        <p ng-repeat="restiction in plantData.metadata.incompatible_with_diatery_restrictions">
+                            {{restiction}}
+                        </p>
                     </tab>
                 </tabset>
             </div>
