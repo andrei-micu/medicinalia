@@ -12,7 +12,12 @@
     var app = angular.module("medicinalia", injectedModules);
 
     app.controller("MainController", function ($scope, $http, $modal, $timeout) {
+        $scope.searchInProgress = false;
+        $scope.plantQueriesToDo = NaN;
+        $scope.plantQueriesFinished = 0;
+
         $scope.searchTextBox = $('#search-textbox');
+        $scope.searchButton = $('#search-button');
         $scope.searchResults = {};
         $scope.searchResultsData = {};
         $scope.selectedPlantId = 0;
@@ -31,28 +36,38 @@
         $scope.showAdBarDelay = 0;
         $scope.adBarPlantId = "";
         $scope.filterData = {
-            zone : {
+            zones : {
                 friendlyName: 'Found in zone',
                 value: '',
                 filterAutocomplete: []
             },
-            forDisease : {
+            forDiseases : {
                 friendlyName: 'Relative to disease',
                 value: '',
                 filterAutocomplete: []
             },
-            dietaryRestriction : {
+            dietaryRestrictions : {
                 friendlyName: 'Dietary restriction',
                 value: '',
                 filterAutocomplete: []
             }
         };
 
+        $scope.toggleSearchButton = function(searching){
+            if(searching){
+                $scope.searchButton.html("Searching...");
+                $scope.searchInProgress = true;
+            } else {
+                $scope.searchButton.html("Search");
+                $scope.searchInProgress = false;
+            }
+        };
+
         $scope.initAutocompleteValues = function (){
             var filterNameToQueryMap = {
-                zone : serverUrl + "zones?callback=JSON_CALLBACK",
-                forDisease : serverUrl + "diseases?callback=JSON_CALLBACK",
-                dietaryRestriction : serverUrl + "dietary-restrictions?callback=JSON_CALLBACK"
+                zones : serverUrl + "zones?callback=JSON_CALLBACK",
+                forDiseases : serverUrl + "diseases?callback=JSON_CALLBACK",
+                dietaryRestrictions : serverUrl + "dietary-restrictions?callback=JSON_CALLBACK"
             };
 
             function setupTypeAhead(filterName) {
@@ -91,29 +106,53 @@
 
         function searchObjectToQueryParams(searchObject) {
             var queryParamsObject = {
-                callback: "JSON_CALLBACK",
-                name: searchObject[0].text
+                callback: "JSON_CALLBACK"
             };
+
+            for (var index in searchObject){
+                var searchString = searchObject[index].text;
+                var filterName = null;
+
+                for(var possibleFilterName in $scope.filterData){
+                    if(searchString.indexOf($scope.filterData[possibleFilterName].friendlyName+ ": ") == 0){
+                        filterName = possibleFilterName;
+                    }
+                }
+
+                if(filterName) {
+                    queryParamsObject[filterName] = searchString.split(":")[1].trim().toLowerCase();
+                } else {
+                    queryParamsObject["name"] = searchString.trim().toLowerCase();
+                }
+            }
 
             return "?" + $.param(queryParamsObject);
         }
 
-        $scope.isSearchInvalid = function (searchObject) {
+        $scope.searchProhibited = function (searchObject) {
+            if($scope.searchInProgress){
+                return true;
+            }
+
             return (!searchObject) || (searchObject.length <= 0 && !$($scope.searchTextBox).find('.tags .input').val());
         };
 
         $scope.performSearch = function (searchObject) {
+            $scope.toggleSearchButton(true);
+
             var queryUrl = serverUrl + "plants/search" + searchObjectToQueryParams(searchObject);
 
             $http.jsonp(queryUrl)
                 .success(function (data) {
                     $scope.searchResults.results = data;
+                    $scope.plantQueriesToDo = data.length;
 
                     $scope.searchResults.results.forEach(function (plantId) {
                         $scope.fetchPlantData(plantId);
                     });
                 })
                 .error(function (data, status, headers, config) {
+                    $scope.toggleSearchButton(false);
                     noisy && alert("Error fetching search results: { queryUrl: " + queryUrl + " status: " + status + ", data: " + data + " }");
                 });
         };
@@ -124,10 +163,20 @@
             $http.jsonp(queryUrl)
                 .success(function (data) {
                     $scope.searchResultsData[plantId] = data;
+                    handlePlantQueryUpdate();
                 })
                 .error(function (data, status, headers, config) {
                     noisy && alert("Error fetching plant data: " + status + " " + data);
+                    handlePlantQueryUpdate();
                 });
+
+            var handlePlantQueryUpdate = function () {
+                $scope.plantQueriesFinished++;
+
+                if ($scope.plantQueriesToDo == $scope.plantQueriesFinished) {
+                    $scope.toggleSearchButton(false);
+                }
+            };
         };
 
         $scope.openPlantDetailsWindow = function (plantId) {
@@ -187,7 +236,7 @@
 
         /* Search plants with high Vitamin C for the ad */
         $timeout(function (){
-            var searchObject = [{ name: "" }];
+            var searchObject = [{ text: "" }];
             var queryUrl = serverUrl + "plants/search" + searchObjectToQueryParams(searchObject);
             var plantQueriesToDo = NaN;
             var plantQueriesFinished = 0;

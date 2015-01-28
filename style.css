@@ -322,3 +322,18 @@ h4 {
 .headers-selected a:hover label {
     color: black;
 }
+
+.welcome-container{
+    position: fixed;
+    left: 50%;
+    top: 50%;
+
+    height: 400px;
+    margin-top: -200px;
+
+    width: 600px;
+    margin-left: -300px;
+
+    text-align: center;
+    vertical-align: middle;
+}

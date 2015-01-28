@@ -56,7 +56,8 @@
                         <div class="filter-input">
                             <div class="input-group">
                                 <span class="input-group-addon">{{filterValue.friendlyName}}:</span>
-                                <input id="{{'input'+filterName}}" type="text" class="form-control" ng-model="filterData[filterName].value" />
+                                <input id="{{'input'+filterName}}" type="text" class="form-control" ng-model="filterData[filterName].value"
+                                       autocomplete="off" />
                             </div>
                         </div>
                         <button type="button" class="btn filter-input-button" ng-click="addFilter(searchObject, filterName)"
@@ -67,11 +68,17 @@
                 </ul>
             </div>
 
-            <button type="submit" class="search-button" ng-disabled="isSearchInvalid(searchObject)">
-                Search
+            <button type="submit" id="search-button" class="search-button"
+                    ng-disabled="searchProhibited(searchObject)" ng-init="toggleSearchButton(false)">
             </button>
         </form>
     </div>
+</div>
+
+<div class="welcome-container" ng-show="!searchResults.results">
+    <img src="images/symbol.png" />
+    <h1>Welcome to Medicinalia!</h1>
+    <h4>Dive in our plant knowledge base instantly: type what you are looking for in the search bar and press Search!</h4>
 </div>
 
 <div class="container search-results-container" ng-class="{blurred : modalOpen}">
@@ -204,12 +211,12 @@
                         <p>Vitamin-E: {{ plantData.metadata.vitamins.ViteMg | showMilligramsPer100Grams }}</p>
                         <p>Zinc: {{ plantData.metadata.vitamins.ZincMg | showMilligramsPer100Grams }}</p>
 
-                        <h4>Compatible dietary restrictions:</h4>
+                        <h4>Compatible with dietary restrictions:</h4>
                         <p ng-repeat="restiction in plantData.metadata.compatible_with_diatery_restrictions">
                             {{restiction}}
                         </p>
 
-                        <h4>Incompatible dietary restrictions:</h4>
+                        <h4>Incompatible with dietary restrictions:</h4>
                         <p ng-repeat="restiction in plantData.metadata.incompatible_with_diatery_restrictions">
                             {{restiction}}
                         </p>
