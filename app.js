@@ -41,7 +41,7 @@
                 value: '',
                 filterAutocomplete: []
             },
-            forDiseases : {
+            forDisease : {
                 friendlyName: 'Relative to disease',
                 value: '',
                 filterAutocomplete: []
@@ -66,7 +66,7 @@
         $scope.initAutocompleteValues = function (){
             var filterNameToQueryMap = {
                 zones : serverUrl + "zones?callback=JSON_CALLBACK",
-                forDiseases : serverUrl + "diseases?callback=JSON_CALLBACK",
+                forDisease : serverUrl + "diseases?callback=JSON_CALLBACK",
                 dietaryRestrictions : serverUrl + "dietary-restrictions?callback=JSON_CALLBACK"
             };
 
@@ -138,6 +138,8 @@
         };
 
         $scope.performSearch = function (searchObject) {
+            $scope.plantQueriesToDo = NaN;
+            $scope.plantQueriesFinished = 0;
             $scope.toggleSearchButton(true);
 
             var queryUrl = serverUrl + "plants/search" + searchObjectToQueryParams(searchObject);
@@ -145,13 +147,19 @@
             $http.jsonp(queryUrl)
                 .success(function (data) {
                     $scope.searchResults.results = data;
-                    $scope.plantQueriesToDo = data.length;
 
-                    $scope.searchResults.results.forEach(function (plantId) {
-                        $scope.fetchPlantData(plantId);
-                    });
+                    if(data.length){
+                        $scope.plantQueriesToDo = data.length;
+
+                        $scope.searchResults.results.forEach(function (plantId) {
+                            $scope.fetchPlantData(plantId);
+                        });
+                    } else {
+                        $scope.toggleSearchButton(false);
+                    }
                 })
                 .error(function (data, status, headers, config) {
+                    $scope.searchResults.results = [];
                     $scope.toggleSearchButton(false);
                     noisy && alert("Error fetching search results: { queryUrl: " + queryUrl + " status: " + status + ", data: " + data + " }");
                 });
@@ -166,8 +174,8 @@
                     handlePlantQueryUpdate();
                 })
                 .error(function (data, status, headers, config) {
-                    noisy && alert("Error fetching plant data: " + status + " " + data);
                     handlePlantQueryUpdate();
+                    noisy && alert("Error fetching plant data: " + status + " " + data);
                 });
 
             var handlePlantQueryUpdate = function () {
@@ -321,8 +329,17 @@
         };
 
         function comparePlantsByName(firstPlant, secondPlant, options){
-            var firstField = firstPlant[options.column].toLowerCase();
-            var secondField = secondPlant[options.column].toLowerCase();
+            var firstField;
+            var secondField;
+            if(firstPlant[options.column]) {
+                var firstField = firstPlant[options.column].toLowerCase();
+            }
+            if(secondPlant[options.column]) {
+                var secondField = secondPlant[options.column].toLowerCase();
+            }
+
+            var firstField = firstField || "zzzzzzzzzzzzzzzz";
+            var secondField = secondField || "zzzzzzzzzzzzzzzz";
 
             if (firstField < secondField) return options.descending ? -1 : 1;
             if (firstField > secondField) return options.descending ? 1 : -1;
@@ -330,8 +347,16 @@
         }
 
         function comparePlantsByPercentages(firstPlant, secondPlant, options){
-            var firstField = firstPlant.metadata.vitamins[options.column] || 0;
-            var secondField = secondPlant.metadata.vitamins[options.column] || 0;
+            var firstField;
+            var secondField;
+            if(firstPlant.metadata.vitamins) {
+                firstField = parseFloat(firstPlant.metadata.vitamins[options.column]);
+            }
+            if(secondPlant.metadata.vitamins) {
+                secondField = parseFloat(secondPlant.metadata.vitamins[options.column]);
+            }
+            var firstField = firstField || 0;
+            var secondField = secondField || 0;
 
             return options.descending ? firstField - secondField : secondField - firstField;
         }
